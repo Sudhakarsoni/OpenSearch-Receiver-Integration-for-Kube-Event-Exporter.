@@ -1,0 +1,30 @@
+logLevel: error
+logFormat: json
+maxEventAgeSeconds: 10
+kubeQPS: 60
+kubeBurst: 60
+
+ route:
+   routes:
+     # Route for OpenSearch and drop own-namespace and Normal events
+     - drop:
+         - namespace: "*event-exporter*"
+         - type: "Normal"
+       match:
+         - receiver: "opensearch-receievr"
+
+ receivers:
+   - name: "opensearch-receievr"
+     opensearch:
+       hosts:
+         - https://{Indexer_IP}:9200/
+
+       index: kube-events
+       indexFormat: "kube-events-{2006-01-02}"
+       username: {Enter OpenSearch-Indexer_User}
+       password: {Enter OpenSearch-Indexer_Pass}
+       useEventID: true
+       deDot: true
+       layout:
+       tls: 
+         insecureSkipVerify: true
